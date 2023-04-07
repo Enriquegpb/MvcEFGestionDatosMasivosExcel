@@ -1,0 +1,112 @@
+﻿@model IEnumerable<MvcEFGestionDatosMasivosExcel.Models.Contabilidad>
+
+@{
+    ViewData["Title"] = "Index";
+}
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            Init();
+            function Init() {
+                $("#btnDownLoadExcel").click(function () {
+                    GenerateAndDownloadExcel();
+                });
+            }
+
+            function GenerateAndDownloadExcel() {
+                $.ajax({
+                    url: "../Contabilidad/GenerateAndDownLoadExcel",
+                    method: 'GET',
+                    success: function (response) {
+                        ExcelFromBase64("Contabilidades.xlsx", response);
+                    },
+                    error: function (response) {
+                        console.log("No se ha podido generar el informe excel");
+                    }
+                });
+
+            }
+
+            function ExcelFromBase64(fileName, bytesBase64) {
+                var link = document.createElement("a");
+                link.download = fileName;
+                link.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + bytesBase64;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+        })
+    </script>
+    }
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<button id="btnDownLoadExcel" class="btn btn-success">Descargar</button>
+<form method="post" enctype="multipart/form-data" action="@Url.Action("ImportContabilidad", "Contabilidad")">
+    <input type="file" name="file" />
+    <button type="submit" id="importar" class="btn btn-success">Importar</button>
+</form>
+
+<form method="post" enctype="multipart/form-data" action="@Url.Action("SubirSaldo", "Contabilidad")">
+    <label>Introduce incremento en el saldo de para las contabilidad</label>
+    <input type="text" name="incremento" class="form-control"/>
+    <button type="submit" class="btn btn-warning">Incrementar Saldo Masivo</button>
+</form>
+<table class="table table-dark">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Apellidos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Direccion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Saldo)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Apellidos)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Direccion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Saldo)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
